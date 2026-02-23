@@ -12,11 +12,13 @@ protocol WeatherLoaderServiceProtocol: AnyObject {
 }
 
 final class WeatherLoaderService {
-    private let provider = MoyaProvider<WeatherTarget>(plugins: [NetworkLoggerPlugin(configuration: .init(logOptions: .verbose))])
+    private let logger = NetworkLoggerPlugin(configuration: .init(logOptions: .verbose))
     private let decoder = JSONDecoder()
+    private let provider: MoyaProvider<WeatherTarget>
     
     init() {
         decoder.keyDecodingStrategy = .convertFromSnakeCase
+        provider = MoyaProvider<WeatherTarget>(plugins: [logger])
     }
 }
 
@@ -30,12 +32,10 @@ extension WeatherLoaderService: WeatherLoaderServiceProtocol {
                         let weatherModel = try self.decoder.decode(WeatherModel.self, from: response.data)
                         continuation.resume(returning: weatherModel)
                     } catch {
-                        print("TESTTEST1 Decode failure: \(error) STATUSCODE \(response.statusCode), description \(response.description), data \(response.data)")
                         continuation.resume(throwing: error)
                     }
                     
                 case .failure(let error):
-                    print("TESTTEST3 \(error)")
                     continuation.resume(throwing: error)
                 }
             }

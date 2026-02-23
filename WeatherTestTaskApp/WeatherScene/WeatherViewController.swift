@@ -15,16 +15,11 @@ protocol WeatherViewControllerProtocol: AnyObject {
 final class WeatherViewController: UIViewController {
     var presenter: WeatherPresenterProtocol?
     
-    private var weatherLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .black
-        label.font = .systemFont(ofSize: 16)
-        return label
-    }()
+    private var currentWeatherView = CurrentWeatherView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .red
+        view.backgroundColor = .blue
         setupLayout()
         
         Task {
@@ -33,19 +28,19 @@ final class WeatherViewController: UIViewController {
     }
     
     private func setupLayout() {
-        view.addSubview(weatherLabel)
+        view.addSubview(currentWeatherView)
 
-        weatherLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview()
+        currentWeatherView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16)
+            make.trailing.equalToSuperview().offset(-16)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
         }
     }
 }
 
 extension WeatherViewController: WeatherViewControllerProtocol {
     func updateActualWeather() async {
-        let data = await presenter?.getWeatherCurrent()
-        
-        weatherLabel.text = data
+        guard let data = await presenter?.getWeatherCurrent() else { return }
+        currentWeatherView.configure(with: data)
     }
 }

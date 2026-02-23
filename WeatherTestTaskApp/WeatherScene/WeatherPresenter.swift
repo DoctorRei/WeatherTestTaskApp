@@ -8,7 +8,7 @@
 import Foundation
 
 protocol WeatherPresenterProtocol: AnyObject {
-    func getWeatherCurrent() async -> String
+    func getWeatherCurrent() async -> WeatherModel?
 }
 
 final class WeatherPresenter {
@@ -21,12 +21,12 @@ final class WeatherPresenter {
 }
 
 extension WeatherPresenter: WeatherPresenterProtocol {
-    func getWeatherCurrent() async -> String {
+    func getWeatherCurrent() async -> WeatherModel? {
         do {
             let data = try await weatherLoaderService.getWeatherCurrent(style: .current)
-            return data.location.country
+            return data
         } catch {
-            return "Error"
+            return nil
         }
     }
 }
