@@ -13,8 +13,9 @@ protocol WeatherAssemblyProtocol {
 
 final class WeatherAssembly: WeatherAssemblyProtocol {
     func configure() -> WeatherViewController {
+        let weatherLoaderSevice = WeatherLoaderService()
         let viewController = WeatherViewController()
-        let presenter = WeatherPresenter()
+        let presenter = WeatherPresenter(weatherLoaderService: weatherLoaderSevice)
         viewController.presenter = presenter
         presenter.view = viewController
         

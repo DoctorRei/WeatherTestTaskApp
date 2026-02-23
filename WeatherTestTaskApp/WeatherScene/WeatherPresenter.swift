@@ -7,8 +7,26 @@
 
 import Foundation
 
-protocol WeatherAssemblyPresenter: AnyObject {}
+protocol WeatherPresenterProtocol: AnyObject {
+    func getWeatherCurrent() async -> String
+}
 
-final class WeatherPresenter: WeatherAssemblyPresenter {
+final class WeatherPresenter {
     weak var view: WeatherViewControllerProtocol?
+    private var weatherLoaderService: WeatherLoaderServiceProtocol
+    
+    init(weatherLoaderService: WeatherLoaderServiceProtocol) {
+        self.weatherLoaderService = weatherLoaderService
+    }
+}
+
+extension WeatherPresenter: WeatherPresenterProtocol {
+    func getWeatherCurrent() async -> String {
+        do {
+            let data = try await weatherLoaderService.getWeatherCurrent(style: .current)
+            return data.location.country
+        } catch {
+            return "Error"
+        }
+    }
 }
