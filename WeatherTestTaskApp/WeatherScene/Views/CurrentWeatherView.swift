@@ -91,7 +91,7 @@ final class CurrentWeatherView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(with model: WeatherModel) {
+    func configure(with model: WeatherModel.CurrentModel) {
         cityLabel.text = model.location.name
         countryLabel.text = model.location.country
         createLabelWithImage("\(model.current.tempC)")

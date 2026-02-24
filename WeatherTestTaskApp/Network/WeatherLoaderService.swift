@@ -8,7 +8,7 @@
 import Moya
 
 protocol WeatherLoaderServiceProtocol: AnyObject {
-    func getWeatherCurrent(style: WeatherTarget) async throws -> WeatherModel
+    func getWeatherCurrent(style: WeatherTarget) async throws -> WeatherModel.CurrentModel
 }
 
 final class WeatherLoaderService {
@@ -23,13 +23,13 @@ final class WeatherLoaderService {
 }
 
 extension WeatherLoaderService: WeatherLoaderServiceProtocol {
-    func getWeatherCurrent(style: WeatherTarget) async throws -> WeatherModel {
+    func getWeatherCurrent(style: WeatherTarget) async throws -> WeatherModel.CurrentModel {
         return try await withCheckedThrowingContinuation { continuation in
             provider.request(style) { result in
                 switch result {
                 case .success(let response):
                     do {
-                        let weatherModel = try self.decoder.decode(WeatherModel.self, from: response.data)
+                        let weatherModel = try self.decoder.decode(WeatherModel.CurrentModel.self, from: response.data)
                         continuation.resume(returning: weatherModel)
                     } catch {
                         continuation.resume(throwing: error)
