@@ -10,6 +10,7 @@ import SnapKit
 
 protocol WeatherViewControllerProtocol: AnyObject {
     func updateActualWeather() async
+    func updateForecastWeather() async
 }
 
 final class WeatherViewController: UIViewController {
@@ -24,6 +25,7 @@ final class WeatherViewController: UIViewController {
         
         Task {
             await updateActualWeather()
+            await updateForecastWeather()
         }
     }
     
@@ -42,5 +44,10 @@ extension WeatherViewController: WeatherViewControllerProtocol {
     func updateActualWeather() async {
         guard let data = await presenter?.getWeatherCurrent() else { return }
         currentWeatherView.configure(with: data)
+    }
+    
+    func updateForecastWeather() async {
+        guard let data = await presenter?.getWeatherForecast() else { return }
+        print("TESTTEST \(data)")
     }
 }
