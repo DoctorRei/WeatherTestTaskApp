@@ -23,7 +23,7 @@ final class WeatherPresenter {
 extension WeatherPresenter: WeatherPresenterProtocol {
     func getWeatherCurrent() async -> WeatherModel.CurrentModel? {
         do {
-            let data = try await weatherLoaderService.getWeatherCurrent(style: .current)
+            let data = try await weatherLoaderService.getWeatherCurrent()
             return data
         } catch {
             return nil

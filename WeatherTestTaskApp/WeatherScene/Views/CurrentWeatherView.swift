@@ -121,14 +121,9 @@ final class CurrentWeatherView: UIView {
     }
     
     private func setupLayout() {
-        locationInfoStack.addArrangedSubview(cityLabel)
-        locationInfoStack.addArrangedSubview(countryLabel)
-        
-        temperatureStack.addArrangedSubview(temperatureImage)
-        temperatureStack.addArrangedSubview(tempertureLabel)
-        
-        currentWeatherStack.addArrangedSubview(locationInfoStack)
-        currentWeatherStack.addArrangedSubview(temperatureStack)
+        locationInfoStack.addArrangedSubviews(cityLabel, countryLabel)
+        temperatureStack.addArrangedSubviews(temperatureImage, tempertureLabel)
+        currentWeatherStack.addArrangedSubviews(locationInfoStack, temperatureStack)
         
         temperatureImage.snp.makeConstraints { make in
             make.size.equalTo(Const.temperatureImageSize)
