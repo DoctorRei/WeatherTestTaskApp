@@ -17,12 +17,17 @@ final class WeatherViewController: UIViewController {
     var presenter: WeatherPresenterProtocol?
     
     private var currentWeatherView = CurrentWeatherView()
+    private var testView = ForecastWeatherViewCell()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .blue
         setupLayout()
         
+        updateWeatherViews()
+    }
+    
+    private func updateWeatherViews() {
         Task {
             await updateActualWeather()
             await updateForecastWeather()
@@ -31,11 +36,18 @@ final class WeatherViewController: UIViewController {
     
     private func setupLayout() {
         view.addSubview(currentWeatherView)
+        view.addSubview(testView)
 
         currentWeatherView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16)
             make.trailing.equalToSuperview().offset(-16)
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
+        }
+        
+        testView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(100)
+            make.leading.equalToSuperview().offset(16)
+            make.trailing.equalToSuperview().offset(-16)
         }
     }
 }
@@ -48,6 +60,8 @@ extension WeatherViewController: WeatherViewControllerProtocol {
     
     func updateForecastWeather() async {
         guard let data = await presenter?.getWeatherForecast() else { return }
-        print("TESTTEST \(data)")
+        guard let hour = data.forecast.forecastday.first?.hour.first else { return }
+        
+        testView.configure(with: hour)
     }
 }
