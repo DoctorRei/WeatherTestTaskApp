@@ -16,7 +16,11 @@ import SnapKit
 /// Страна
 /// Слева градусы
 
-final class CurrentWeatherView: UIView {
+final class CurrentWeatherCell: UICollectionViewCell {
+    static var identifire: String {
+        description()
+    }
+    
     private enum Const {
         static let cityLabelFontSize: CGFloat = 18
         static let countryLabelFontSize: CGFloat = 16
@@ -79,11 +83,10 @@ final class CurrentWeatherView: UIView {
         return stackView
     }()
     
-    init() {
+    override init(frame: CGRect) {
         super.init(frame: .zero)
         setupLayout()
         setupLayer()
-        currentWeatherStack.backgroundColor = .blue
     }
     
     required init?(coder: NSCoder) {
@@ -118,5 +121,12 @@ final class CurrentWeatherView: UIView {
         currentWeatherStack.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(Const.currentWeatherStackInset)
         }
+    }
+    
+    override func prepareForReuse() {
+        cityLabel.text = nil
+        countryLabel.text = nil
+        tempertureLabel.text = nil
+        temperatureImage.image = nil
     }
 }

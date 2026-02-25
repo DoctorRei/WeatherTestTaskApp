@@ -9,27 +9,19 @@ import UIKit
 import SnapKit
 
 final class WeatherCollectionView: UIView {
+    typealias Model = WeatherModel
+    
     private enum WeatherSectionTypes {
         case weatherCurrent(WeatherModel.CurrentModel)
         case weatherByHour(WeatherModel.ForecastModel)
-        case weather3Days(WeatherModel.ForecastModel)
     }
     
-//    private var sectionDataSource: [[UIColor]] = {
-//        let firstColors: [UIColor] = [.yellow, .yellow, .yellow]
-//        let seccondColors: [UIColor] = [.systemBlue, .systemBlue, .systemBlue, .systemBlue]
-//        let thirdColors: [UIColor] = [.systemGreen, .systemGreen, .systemGreen, .systemGreen, .systemGreen]
-//        
-//        return [firstColors, seccondColors, thirdColors]
-//    }()
-    
-    private var sectionDataSource: [[WeatherSectionTypes]] = []
+    private var dataSource: [WeatherSectionTypes] = []
     
     private var collectionView: UICollectionView = {
         let flowlayout = UICollectionViewFlowLayout()
         flowlayout.scrollDirection = .vertical
         let collection = UICollectionView(frame: .zero, collectionViewLayout: flowlayout)
-        collection.backgroundColor = .red
         return collection
     }()
     
@@ -51,6 +43,15 @@ final class WeatherCollectionView: UIView {
         }
     }
     
+    func configure(with current: Model.CurrentModel, and forecast: Model.ForecastModel) {
+        let currentType = WeatherSectionTypes.weatherCurrent(current)
+        let forecastType = WeatherSectionTypes.weatherByHour(forecast)
+        
+        dataSource.append(currentType)
+        dataSource.append(forecastType)
+        collectionView.reloadData()
+    }
+    
     private func setupCollectionView() {
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -59,6 +60,10 @@ final class WeatherCollectionView: UIView {
     }
     
     private func registerCells() {
+        collectionView.register(
+            CurrentWeatherCell.self,
+            forCellWithReuseIdentifier: CurrentWeatherCell.identifire
+        )
         collectionView.register(
             ForecastWeatherViewCell.self,
             forCellWithReuseIdentifier: ForecastWeatherViewCell.identifire
@@ -83,18 +88,18 @@ final class WeatherCollectionView: UIView {
         case 0:
             return createSection(
                 itemWidth: .fractionalWidth(1),
-                itemHeight: .absolute(200),
+                itemHeight: .estimated(200),
                 groupWidth: .fractionalWidth(1),
-                groupHeight: .absolute(200),
-                scrollBehavior: .groupPagingCentered
+                groupHeight: .estimated(200),
+                sectionInsets: .init(top: 10, leading: 10, bottom: 10, trailing: 10)
             )
         case 1:
             return createSection(
-                itemWidth: .fractionalWidth(1/3),
-                itemHeight: .absolute(100),
+                itemWidth: .fractionalWidth(1),
+                itemHeight: .estimated(100),
                 interItemSpacing: 10,
                 groupWidth: .fractionalWidth(1),
-                groupHeight: .absolute(100),
+                groupHeight: .estimated(100),
                 interGroupSpacing: 10,
                 sectionInsets: .init(top: 10, leading: 10, bottom: 10, trailing: 10),
                 headerHeight: .absolute(50),
@@ -111,10 +116,8 @@ final class WeatherCollectionView: UIView {
                 sectionInsets: .init(top: 10, leading: 10, bottom: 10, trailing: 10)
             )
         default:
-            break
+            return createEmptySection()
         }
-        
-        return createEmptySection()
     }
     
     func createSection(
@@ -139,7 +142,7 @@ final class WeatherCollectionView: UIView {
         
         let section = NSCollectionLayoutSection(group: group)
         // lобавляем скролл, без него работать можно
-        section.orthogonalScrollingBehavior = scrollBehavior
+//        section.orthogonalScrollingBehavior = scrollBehavior
         section.interGroupSpacing = interGroupSpacing
         section.contentInsets = sectionInsets
         
@@ -168,24 +171,55 @@ final class WeatherCollectionView: UIView {
 }
 
 extension WeatherCollectionView: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        sectionDataSource[section].count
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return dataSource.count
     }
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        sectionDataSource.count
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        var total = 0
+        let sectionItem = dataSource[section]
+        
+        switch sectionItem {
+        case .weatherCurrent:
+            total += 1
+        case .weatherByHour(let forecastModel):
+            guard let hours = forecastModel.forecast.forecastday.first?.hour else { return total }
+            total += hours.count
+            
+            print("TESTTEST \(forecastModel.forecast.forecastday.count)")
+        }
+        
+        return total
     }
     
     func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ForecastWeatherViewCell.identifire, for: indexPath) as? ForecastWeatherViewCell else { return .init() }
+        let sectionItem = dataSource[indexPath.section]
         
-        cell.backgroundColor = sectionDataSource[indexPath.section][indexPath.item]
-        cell.layer.borderWidth = 2
-        cell.layer.borderColor = UIColor.black.cgColor
-        return cell
+        switch sectionItem {
+        case .weatherCurrent(let model):
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: CurrentWeatherCell.identifire,
+                for: indexPath
+            ) as? CurrentWeatherCell else { return .init() }
+            
+            cell.configure(with: model)
+            
+            return cell
+        case .weatherByHour(let model):
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: ForecastWeatherViewCell.identifire,
+                for: indexPath
+            ) as? ForecastWeatherViewCell else { return .init() }
+
+            if let hour = model.forecast.forecastday.first?.hour[indexPath.item] {
+                cell.configure(with: hour)
+            }
+
+            return cell
+        }
     }
     
     func collectionView(
@@ -201,12 +235,12 @@ extension WeatherCollectionView: UICollectionViewDelegate, UICollectionViewDataS
             ) as? HeaderViewCell else {
                 return .init()
             }
+            cell.configure(with: "Label with Text")
             cell.backgroundColor = .gray
             return cell
         }
 
         return UICollectionReusableView()
     }
-    
 }
 

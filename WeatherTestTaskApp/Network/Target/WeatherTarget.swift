@@ -46,7 +46,8 @@ extension WeatherTarget: TargetType {
             return .requestParameters(
                 parameters: [
                     "key": "fa8b3df74d4042b9aa7135114252304",
-                    "q": "LAT,LON"
+                    "q": "LAT,LON",
+                    "days": "3"
                 ],
                 encoding: URLEncoding.default
             )

@@ -16,7 +16,7 @@ protocol WeatherViewControllerProtocol: AnyObject {
 final class WeatherViewController: UIViewController {
     var presenter: WeatherPresenterProtocol?
     
-    private var currentWeatherView = CurrentWeatherView()
+    private var currentWeatherView = CurrentWeatherCell()
     private var testView = ForecastWeatherViewCell()
     private var weatherCollectionView = WeatherCollectionView()
     
@@ -24,13 +24,27 @@ final class WeatherViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .blue
         setupLayout()
-        updateWeatherViews()
+        loadWeatherData()
     }
     
     private func updateWeatherViews() {
         Task {
             await updateActualWeather()
             await updateForecastWeather()
+        }
+    }
+    
+    func loadWeatherData() {
+        Task {
+            async let actualWeather = presenter?.getWeatherCurrent()
+            async let forecastWeather = presenter?.getWeatherForecast()
+            
+            let (current, forecast) = await (actualWeather, forecastWeather)
+            
+            guard let current, let forecast else { return }
+            await MainActor.run {
+                weatherCollectionView.configure(with: current, and: forecast)
+            }
         }
     }
     
