@@ -14,9 +14,12 @@ final class ForecastWeatherCellForHour: UICollectionViewCell {
     }
     
     private enum Const {
+        enum Layout {
+            static let temperatureImageSize: CGFloat = 50
+            static let cellInset: CGFloat = 8
+        }
+
         static let conditionStackSpacing: CGFloat = 2
-        static let temperatureImageSize: CGFloat = 50
-        static let cellInset: CGFloat = 8
     }
     
     private let timeLabel = UILabel()
@@ -49,13 +52,13 @@ final class ForecastWeatherCellForHour: UICollectionViewCell {
     private func setupLayout() {
         totalInfoStack.addArrangedSubviews(timeLabel, temperatureImageView, temperatureLabel)
         temperatureImageView.snp.makeConstraints { make in
-            make.size.equalTo(Const.temperatureImageSize)
+            make.size.equalTo(Const.Layout.temperatureImageSize)
         }
         
         addSubview(totalInfoStack)
         
         totalInfoStack.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(Const.cellInset)
+            make.edges.equalToSuperview().inset(Const.Layout.cellInset)
         }
         
     }

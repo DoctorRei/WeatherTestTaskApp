@@ -13,6 +13,19 @@ final class WeatherForThreeDays: UICollectionViewCell {
         description()
     }
     
+    private enum Const {
+        enum Color {
+            static let borderColor: CGColor = UIColor.systemPink.withAlphaComponent(0.2).cgColor
+        }
+        
+        enum Layout {
+            static let temperatureImageSize: CGFloat = 30
+        }
+
+        static let borderWidth: CGFloat = 1
+        static let cornerRadius: CGFloat = 8
+    }
+    
     private var dataLabel = UILabel()
     private var temperatureLabel = UILabel()
     private var temperatureImage = UIImageView()
@@ -48,9 +61,9 @@ final class WeatherForThreeDays: UICollectionViewCell {
     }
     
     private func setupLayer() {
-        layer.borderWidth = 1
-        layer.borderColor = UIColor.black.cgColor
-        layer.cornerRadius = 8
+        layer.borderWidth = Const.borderWidth
+        layer.borderColor = Const.Color.borderColor
+        layer.cornerRadius = Const.cornerRadius
     }
     
     private func setupLayout() {
@@ -60,7 +73,7 @@ final class WeatherForThreeDays: UICollectionViewCell {
         addSubview(weatherStackView)
         
         temperatureImage.snp.makeConstraints { make in
-            make.size.equalTo(30)
+            make.size.equalTo(Const.Layout.temperatureImageSize)
         }
         
         weatherStackView.snp.makeConstraints { make in

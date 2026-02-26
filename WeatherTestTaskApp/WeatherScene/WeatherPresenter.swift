@@ -21,11 +21,12 @@ final class WeatherPresenter {
     }
     
     weak var view: WeatherViewControllerProtocol?
-    private var weatherLoaderService: WeatherLoaderServiceProtocol
-    private var locationManager = LocationManager()
+    private var weatherLoaderService: WeatherLoaderServiceProtocol?
+    private var locationManager: LocationManagerProtocol?
     
-    init(weatherLoaderService: WeatherLoaderServiceProtocol) {
+    init(weatherLoaderService: WeatherLoaderServiceProtocol, locationManager: LocationManagerProtocol) {
         self.weatherLoaderService = weatherLoaderService
+        self.locationManager = locationManager
     }
 }
 
@@ -38,7 +39,7 @@ extension WeatherPresenter: WeatherPresenterProtocol {
     
     private func handleLocationAndWeather() async {
         do {
-            let coordinate = try await locationManager.requestLocation()
+            guard let coordinate = try await locationManager?.requestLocation() else { return }
             getWeatherData(with: coordinate)
         } catch LocationError.authorizationDenied {
             getWeatherData(with: Const.moscowCoordinates)
@@ -63,7 +64,7 @@ extension WeatherPresenter: WeatherPresenterProtocol {
 private extension WeatherPresenter {
     func getWeatherCurrent(with coordinate: CLLocationCoordinate2D) async -> WeatherModel.CurrentModel? {
         do {
-            let data = try await weatherLoaderService.getWeatherCurrent(
+            let data = try await weatherLoaderService?.getWeatherCurrent(
                 latitude: coordinate.latitude.description,
                 longitude: coordinate.longitude.description
             )
@@ -75,7 +76,7 @@ private extension WeatherPresenter {
     
     func getWeatherForecast(with coordinate: CLLocationCoordinate2D) async -> WeatherModel.ForecastModel? {
         do {
-            let data = try await weatherLoaderService.getWeatherForecast(
+            let data = try await weatherLoaderService?.getWeatherForecast(
                 latitude: coordinate.latitude.description,
                 longitude: coordinate.longitude.description
             )

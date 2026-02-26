@@ -63,6 +63,8 @@ final class WeatherCollectionView: UIView {
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.setCollectionViewLayout(createFlowLayout(), animated: false)
+        collectionView.backgroundColor = .clear
+        collectionView.bounces = false
         registerCells()
     }
     
