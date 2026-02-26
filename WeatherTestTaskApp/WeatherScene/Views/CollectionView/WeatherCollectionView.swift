@@ -9,12 +9,13 @@ import UIKit
 import SnapKit
 
 final class WeatherCollectionView: UIView {
-    typealias Model = WeatherModel
+    typealias CurrentModel = WeatherModel.CurrentModel
+    typealias ForecastModel = WeatherModel.ForecastModel
     
     private enum WeatherSectionTypes {
-        case weatherCurrent(WeatherModel.CurrentModel)
-        case weatherForThreeDays(WeatherModel.ForecastModel)
-        case weatherByHour(WeatherModel.ForecastModel)
+        case weatherCurrent(CurrentModel)
+        case weatherForThreeDays(ForecastModel)
+        case weatherByHour(ForecastModel)
     }
     
     private var dataSource: [WeatherSectionTypes] = []
@@ -44,7 +45,7 @@ final class WeatherCollectionView: UIView {
         }
     }
     
-    func configure(with current: Model.CurrentModel, and forecast: Model.ForecastModel) {
+    func configure(with current: CurrentModel, and forecast: ForecastModel) {
         let currentType = WeatherSectionTypes.weatherCurrent(current)
         let forecastType = WeatherSectionTypes.weatherByHour(forecast)
         let forecastForThreeDays = WeatherSectionTypes.weatherForThreeDays(forecast)
@@ -81,86 +82,12 @@ final class WeatherCollectionView: UIView {
     }
     
     func createFlowLayout() -> UICollectionViewCompositionalLayout {
-        let layout = UICollectionViewCompositionalLayout { [weak self] index, env in
-            self?.getSectionFor(index: index)
+        let layout = UICollectionViewCompositionalLayout { index, env in
+            guard let section = WeatherSection(rawValue: index) else { return nil }
+            
+            return section.createLayout()
         }
-
         return layout
-    }
-
-    func getSectionFor(index: Int) -> NSCollectionLayoutSection {
-        switch index {
-        case 0:
-            return createSection(
-                itemWidth: .fractionalWidth(1),
-                itemHeight: .estimated(200),
-                groupWidth: .fractionalWidth(1),
-                groupHeight: .estimated(200),
-                sectionInsets: .init(top: 10, leading: 10, bottom: 10, trailing: 10)
-            )
-        case 1:
-            return createSection(
-                itemWidth: .fractionalWidth(1/3),
-                itemHeight: .absolute(100),
-                interItemSpacing: 10,
-                groupWidth: .fractionalWidth(1),
-                groupHeight: .absolute(100),
-                interGroupSpacing: 10,
-                sectionInsets: .init(top: 10, leading: 10, bottom: 10, trailing: 10)
-            )
-        case 2:
-            return createSection(
-                itemWidth: .fractionalWidth(1/5),
-                itemHeight: .estimated(100),
-                interItemSpacing: 10,
-                groupWidth: .fractionalWidth(1),
-                groupHeight: .estimated(100),
-                interGroupSpacing: 10,
-                sectionInsets: .init(top: 10, leading: 10, bottom: 10, trailing: 10),
-                scrollBehavior: .continuous
-            )
-        default:
-            return createEmptySection()
-        }
-    }
-    
-    func createSection(
-        itemWidth: NSCollectionLayoutDimension,
-        itemHeight: NSCollectionLayoutDimension,
-        interItemSpacing: Double = .zero,
-        groupWidth: NSCollectionLayoutDimension,
-        groupHeight: NSCollectionLayoutDimension,
-        interGroupSpacing: Double = .zero,
-        sectionInsets: NSDirectionalEdgeInsets = .zero,
-        scrollBehavior: UICollectionLayoutSectionOrthogonalScrollingBehavior? = nil
-    ) -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(widthDimension: itemWidth, heightDimension: itemHeight)
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        
-        let groupSize = NSCollectionLayoutSize(widthDimension: groupWidth, heightDimension: groupHeight)
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        
-        // короче меченный. Между элементами интервал понятно. Группы мы сами указываем сколько ячеек в одной группе. Потому если не указывать интервал между группами, то вторая группа не примет значения интер итема
-        group.interItemSpacing = .fixed(interItemSpacing)
-
-        let section = NSCollectionLayoutSection(group: group)
-        // lобавляем скролл, без него работать можно
-        if let scrollBehavior {
-            section.orthogonalScrollingBehavior = scrollBehavior
-        }
-        section.interGroupSpacing = interGroupSpacing
-        section.contentInsets = sectionInsets
-        
-        return section
-    }
-    
-    func createEmptySection(height: CGFloat = 0) -> NSCollectionLayoutSection {
-        createSection(
-            itemWidth: .fractionalWidth(1),
-            itemHeight: .absolute(height),
-            groupWidth: .fractionalWidth(1),
-            groupHeight: .absolute(height)
-        )
     }
 }
 
@@ -170,20 +97,20 @@ extension WeatherCollectionView: UICollectionViewDelegate, UICollectionViewDataS
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        var total = 0
+        var sectionsCount = 0
         let sectionItem = dataSource[section]
         
         switch sectionItem {
         case .weatherCurrent:
-            total += 1
+            sectionsCount += 1
         case .weatherByHour(let forecastModel):
-            guard let hours = forecastModel.forecast.forecastday.first?.hour else { return total }
-            total += hours.count
+            guard let hours = forecastModel.forecast.forecastday.first?.hour else { return sectionsCount }
+            sectionsCount += hours.count
         case .weatherForThreeDays(let forecastModel):
-            total += forecastModel.forecast.forecastday.count
+            sectionsCount += forecastModel.forecast.forecastday.count
         }
         
-        return total
+        return sectionsCount
     }
     
     func collectionView(

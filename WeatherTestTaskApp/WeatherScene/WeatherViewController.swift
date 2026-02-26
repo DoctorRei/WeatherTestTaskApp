@@ -9,42 +9,24 @@ import UIKit
 import SnapKit
 
 protocol WeatherViewControllerProtocol: AnyObject {
-    func updateActualWeather() async
-    func updateForecastWeather() async
+    typealias CurrentModel = WeatherModel.CurrentModel
+    typealias ForecastModel = WeatherModel.ForecastModel
+
+    func updateWeatherCollection(current: CurrentModel, forecast: ForecastModel)
 }
 
 final class WeatherViewController: UIViewController {
     var presenter: WeatherPresenterProtocol?
-    
-    private var currentWeatherView = CurrentWeatherCell()
-    private var testView = ForecastWeatherViewCell()
     private var weatherCollectionView = WeatherCollectionView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
-        loadWeatherData()
+        getWeatherData()
     }
     
-    private func updateWeatherViews() {
-        Task {
-            await updateActualWeather()
-            await updateForecastWeather()
-        }
-    }
-    
-    func loadWeatherData() {
-        Task {
-            async let actualWeather = presenter?.getWeatherCurrent()
-            async let forecastWeather = presenter?.getWeatherForecast()
-            
-            let (current, forecast) = await (actualWeather, forecastWeather)
-            
-            guard let current, let forecast else { return }
-            await MainActor.run {
-                weatherCollectionView.configure(with: current, and: forecast)
-            }
-        }
+    private func getWeatherData() {
+        presenter?.getWeatherData()
     }
     
     private func setupLayout() {
@@ -57,15 +39,8 @@ final class WeatherViewController: UIViewController {
 }
 
 extension WeatherViewController: WeatherViewControllerProtocol {
-    func updateActualWeather() async {
-        guard let data = await presenter?.getWeatherCurrent() else { return }
-        currentWeatherView.configure(with: data)
-    }
-    
-    func updateForecastWeather() async {
-        guard let data = await presenter?.getWeatherForecast() else { return }
-        guard let hour = data.forecast.forecastday.first?.hour.first else { return }
-        
-        testView.configure(with: hour)
+    @MainActor
+    func updateWeatherCollection(current: CurrentModel, forecast: ForecastModel) {
+        weatherCollectionView.configure(with: current, and: forecast)
     }
 }
