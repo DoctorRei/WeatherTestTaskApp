@@ -8,20 +8,15 @@
 import UIKit
 import SnapKit
 
-// - Отобразить один экран с погодной информацией: текущая, почасовая (показывать оставшиеся часы из текущего дня и все часы следующего), прогноз погоды на 3 дня.
-// - Обработать показ загрузки и ошибку, если что-то пошло не так, с кнопкой повторного запроса
-// - По дизайну никаких ограничений нет, можно ориентироваться на погодное приложение Apple
-
-/// Город
-/// Страна
-/// Слева градусы
-
 final class CurrentWeatherCell: UICollectionViewCell {
     static var identifire: String {
         description()
     }
     
     private enum Const {
+        enum Color {
+            static let borderColor: CGColor = UIColor.systemPink.withAlphaComponent(0.2).cgColor
+        }
         static let cityLabelFontSize: CGFloat = 18
         static let countryLabelFontSize: CGFloat = 16
         static let temperatureLabelFontSize: CGFloat = 40
@@ -32,6 +27,9 @@ final class CurrentWeatherCell: UICollectionViewCell {
         
         static let celsiusImageSize: CGSize = .init(width: 30, height: 24)
         static let temperatureImageSize: CGFloat = 40
+        
+        static let borderWidth: CGFloat = 1
+        static let cornerRadius: CGFloat = 8
     }
     
     private var cityLabel: UILabel = {
@@ -100,11 +98,10 @@ final class CurrentWeatherCell: UICollectionViewCell {
         temperatureImage.kfDownloadImage(withURL: model.current.condition.iconURL)
     }
     
-    // TODO: - Сделать что-то получше
     private func setupLayer() {
-        layer.borderWidth = 1
-        layer.borderColor = UIColor.black.cgColor
-        layer.cornerRadius = 8
+        layer.borderWidth = Const.borderWidth
+        layer.borderColor = Const.Color.borderColor
+        layer.cornerRadius = Const.cornerRadius
     }
     
     private func setupLayout() {

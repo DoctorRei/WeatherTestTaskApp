@@ -9,32 +9,45 @@ import UIKit
 import SnapKit
 
 final class LoaderView: UIView {
+    private enum Const {
+        enum Font {
+            static let font: UIFont = .systemFont(ofSize: 16, weight: .medium)
+        }
+        
+        enum Color {
+            static let softPink: UIColor = .systemPink.withAlphaComponent(0.2)
+            static let white: CGColor = UIColor.white.cgColor
+        }
+        
+        enum Layout {
+            static let heightStatic: CGFloat = 150
+            static let weidthStatic: CGFloat = 200
+        }
+        
+        static let containerCornerRadius: CGFloat = 16
+        static let containerBorderWidth: CGFloat = 1
+        static let containerSpacing: CGFloat = 10
+    }
+    
     private let activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
-        indicator.color = .white
         indicator.hidesWhenStopped = true
         return indicator
     }()
     
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.font = Const.Font.font
         label.textAlignment = .center
-        label.numberOfLines = 0
         return label
-    }()
-    
-    private let backgroundView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.7)
-        return view
     }()
     
     private let containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(white: 0.2, alpha: 0.9)
-        view.layer.cornerRadius = 16
+        view.backgroundColor = Const.Color.softPink
+        view.layer.cornerRadius = Const.containerCornerRadius
+        view.layer.borderWidth = Const.containerBorderWidth
+        view.layer.borderColor = Const.Color.white
         view.clipsToBounds = true
         return view
     }()
@@ -42,7 +55,7 @@ final class LoaderView: UIView {
     private let loaderStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = 10
+        stack.spacing = Const.containerSpacing
         return stack
     }()
     
@@ -56,18 +69,19 @@ final class LoaderView: UIView {
     }
     
     private func setupUI() {
-        addSubviews(backgroundView, containerView)
+        addSubviews(containerView)
         loaderStackView.addArrangedSubviews(activityIndicator, messageLabel)
         containerView.addSubview(loaderStackView)
         
-        backgroundView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
         containerView.snp.makeConstraints { make in
             make.center.equalToSuperview()
-            make.height.equalTo(150)
-            make.width.equalTo(200)
+            make.height.equalTo(Const.Layout.heightStatic)
+            make.width.equalTo(Const.Layout.weidthStatic)
+        }
+        
+        loaderStackView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
         }
     }
     
@@ -78,6 +92,7 @@ final class LoaderView: UIView {
     }
     
     func stop() {
+        messageLabel.text = nil
         activityIndicator.stopAnimating()
     }
 }

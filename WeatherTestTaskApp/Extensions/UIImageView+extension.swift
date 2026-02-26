@@ -13,14 +13,10 @@ extension UIImageView {
         static let animationTime: Double = 1
     }
     
-    func kfDownloadImage(withURL url: URL?, width: Int = Const.defaultImageSize, height: Int = Const.defaultImageSize) {
+    func kfDownloadImage(withURL url: URL?) {
         guard let url else { return }
-        let processor = DownsamplingImageProcessor(
-            size: CGSize(width: width, height: height)
-        )
         
         let options: KingfisherOptionsInfo = [
-            .processor(processor),
             .scaleFactor(UIScreen.main.scale),
             .transition(.fade(Const.animationTime)),
             .cacheOriginalImage
