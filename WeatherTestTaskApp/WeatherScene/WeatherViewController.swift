@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreLocation
 import SnapKit
 
 protocol WeatherViewControllerProtocol: AnyObject {
@@ -21,12 +22,8 @@ final class WeatherViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        presenter?.viewDidLoad()
         setupLayout()
-        getWeatherData()
-    }
-    
-    private func getWeatherData() {
-        presenter?.getWeatherData()
     }
     
     private func setupLayout() {

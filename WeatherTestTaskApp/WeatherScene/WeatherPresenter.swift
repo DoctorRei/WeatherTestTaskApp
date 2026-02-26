@@ -6,14 +6,23 @@
 //
 
 import Foundation
+import CoreLocation
 
 protocol WeatherPresenterProtocol: AnyObject {
-    func getWeatherData()
+    func viewDidLoad()
 }
 
 final class WeatherPresenter {
+    enum Const {
+        static let moscowCoordinates = CLLocationCoordinate2D(
+            latitude: 55.7558,
+            longitude: 37.6176
+        )
+    }
+    
     weak var view: WeatherViewControllerProtocol?
     private var weatherLoaderService: WeatherLoaderServiceProtocol
+    private var locationManager = LocationManager()
     
     init(weatherLoaderService: WeatherLoaderServiceProtocol) {
         self.weatherLoaderService = weatherLoaderService
@@ -21,10 +30,27 @@ final class WeatherPresenter {
 }
 
 extension WeatherPresenter: WeatherPresenterProtocol {
-    func getWeatherData() {
+    func viewDidLoad() {
+        Task { [weak self] in
+            await self?.handleLocationAndWeather()
+        }
+    }
+    
+    private func handleLocationAndWeather() async {
+        do {
+            let coordinate = try await locationManager.requestLocation()
+            getWeatherData(with: coordinate)
+        } catch LocationError.authorizationDenied {
+            getWeatherData(with: Const.moscowCoordinates)
+        } catch {
+            getWeatherData(with: Const.moscowCoordinates)
+        }
+    }
+    
+    func getWeatherData(with coordinate: CLLocationCoordinate2D) {
         Task {
-            async let actualWeather = getWeatherCurrent()
-            async let forecastWeather = getWeatherForecast()
+            async let actualWeather = getWeatherCurrent(with: coordinate)
+            async let forecastWeather = getWeatherForecast(with: coordinate)
             
             let (current, forecast) = await (actualWeather, forecastWeather)
             
@@ -35,18 +61,24 @@ extension WeatherPresenter: WeatherPresenterProtocol {
 }
 
 private extension WeatherPresenter {
-    func getWeatherCurrent() async -> WeatherModel.CurrentModel? {
+    func getWeatherCurrent(with coordinate: CLLocationCoordinate2D) async -> WeatherModel.CurrentModel? {
         do {
-            let data = try await weatherLoaderService.getWeatherCurrent()
+            let data = try await weatherLoaderService.getWeatherCurrent(
+                latitude: coordinate.latitude.description,
+                longitude: coordinate.longitude.description
+            )
             return data
         } catch {
             return nil
         }
     }
     
-    func getWeatherForecast() async -> WeatherModel.ForecastModel? {
+    func getWeatherForecast(with coordinate: CLLocationCoordinate2D) async -> WeatherModel.ForecastModel? {
         do {
-            let data = try await weatherLoaderService.getWeatherForecast()
+            let data = try await weatherLoaderService.getWeatherForecast(
+                latitude: coordinate.latitude.description,
+                longitude: coordinate.longitude.description
+            )
             return data
         } catch {
             return nil
