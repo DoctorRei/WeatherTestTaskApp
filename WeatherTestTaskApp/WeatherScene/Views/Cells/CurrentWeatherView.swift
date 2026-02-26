@@ -102,8 +102,8 @@ final class CurrentWeatherCell: UICollectionViewCell {
     
     // TODO: - Сделать что-то получше
     private func setupLayer() {
-        layer.borderWidth = 2
-        layer.borderColor = .init(red: 100, green: 0, blue: 100, alpha: 1)
+        layer.borderWidth = 1
+        layer.borderColor = UIColor.black.cgColor
         layer.cornerRadius = 8
     }
     

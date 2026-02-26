@@ -9,6 +9,10 @@ import UIKit
 import SnapKit
 
 final class WeatherForThreeDays: UICollectionViewCell {
+    static var identifire: String {
+        description()
+    }
+    
     private var dataLabel = UILabel()
     private var temperatureLabel = UILabel()
     private var temperatureImage = UIImageView()
@@ -23,13 +27,14 @@ final class WeatherForThreeDays: UICollectionViewCell {
         stackView.axis = .vertical
         stackView.spacing = 2
         stackView.alignment = .center
+        stackView.distribution = .fillEqually
         return stackView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
         setupLayout()
-        backgroundColor = .brown
+        setupLayer()
     }
     
     required init?(coder: NSCoder) {
@@ -42,14 +47,24 @@ final class WeatherForThreeDays: UICollectionViewCell {
         dataLabel.text = model.date
     }
     
+    private func setupLayer() {
+        layer.borderWidth = 1
+        layer.borderColor = UIColor.black.cgColor
+        layer.cornerRadius = 8
+    }
+    
     private func setupLayout() {
         temperatureInfoStackView.addArrangedSubviews(temperatureImage, temperatureLabel)
         weatherStackView.addArrangedSubviews(dataLabel, temperatureInfoStackView)
         
         addSubview(weatherStackView)
         
+        temperatureImage.snp.makeConstraints { make in
+            make.size.equalTo(30)
+        }
+        
         weatherStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.center.equalToSuperview()
         }
     }
 }

@@ -13,6 +13,7 @@ final class WeatherCollectionView: UIView {
     
     private enum WeatherSectionTypes {
         case weatherCurrent(WeatherModel.CurrentModel)
+        case weatherForThreeDays(WeatherModel.ForecastModel)
         case weatherByHour(WeatherModel.ForecastModel)
     }
     
@@ -46,9 +47,14 @@ final class WeatherCollectionView: UIView {
     func configure(with current: Model.CurrentModel, and forecast: Model.ForecastModel) {
         let currentType = WeatherSectionTypes.weatherCurrent(current)
         let forecastType = WeatherSectionTypes.weatherByHour(forecast)
+        let forecastForThreeDays = WeatherSectionTypes.weatherForThreeDays(forecast)
         
         dataSource.append(currentType)
+        if forecast.forecast.forecastday.count > 1 {
+            dataSource.append(forecastForThreeDays)
+        }
         dataSource.append(forecastType)
+        
         collectionView.reloadData()
     }
     
@@ -65,13 +71,12 @@ final class WeatherCollectionView: UIView {
             forCellWithReuseIdentifier: CurrentWeatherCell.identifire
         )
         collectionView.register(
-            ForecastWeatherViewCell.self,
-            forCellWithReuseIdentifier: ForecastWeatherViewCell.identifire
+            ForecastWeatherViewCellV2.self,
+            forCellWithReuseIdentifier: ForecastWeatherViewCellV2.identifire
         )
         collectionView.register(
-            HeaderViewCell.self,
-            forSupplementaryViewOfKind: HeaderViewCell.identifire,
-            withReuseIdentifier: HeaderViewCell.identifire
+            WeatherForThreeDays.self,
+            forCellWithReuseIdentifier: WeatherForThreeDays.identifire
         )
     }
     
@@ -79,10 +84,10 @@ final class WeatherCollectionView: UIView {
         let layout = UICollectionViewCompositionalLayout { [weak self] index, env in
             self?.getSectionFor(index: index)
         }
-        
+
         return layout
     }
-    
+
     func getSectionFor(index: Int) -> NSCollectionLayoutSection {
         switch index {
         case 0:
@@ -95,18 +100,6 @@ final class WeatherCollectionView: UIView {
             )
         case 1:
             return createSection(
-                itemWidth: .fractionalWidth(1),
-                itemHeight: .estimated(100),
-                interItemSpacing: 10,
-                groupWidth: .fractionalWidth(1),
-                groupHeight: .estimated(100),
-                interGroupSpacing: 10,
-                sectionInsets: .init(top: 10, leading: 10, bottom: 10, trailing: 10),
-                headerHeight: .absolute(50),
-                scrollBehavior: .continuous
-            )
-        case 2:
-            return createSection(
                 itemWidth: .fractionalWidth(1/3),
                 itemHeight: .absolute(100),
                 interItemSpacing: 10,
@@ -114,6 +107,17 @@ final class WeatherCollectionView: UIView {
                 groupHeight: .absolute(100),
                 interGroupSpacing: 10,
                 sectionInsets: .init(top: 10, leading: 10, bottom: 10, trailing: 10)
+            )
+        case 2:
+            return createSection(
+                itemWidth: .fractionalWidth(1/5),
+                itemHeight: .estimated(100),
+                interItemSpacing: 10,
+                groupWidth: .fractionalWidth(1),
+                groupHeight: .estimated(100),
+                interGroupSpacing: 10,
+                sectionInsets: .init(top: 10, leading: 10, bottom: 10, trailing: 10),
+                scrollBehavior: .continuous
             )
         default:
             return createEmptySection()
@@ -128,8 +132,7 @@ final class WeatherCollectionView: UIView {
         groupHeight: NSCollectionLayoutDimension,
         interGroupSpacing: Double = .zero,
         sectionInsets: NSDirectionalEdgeInsets = .zero,
-        headerHeight: NSCollectionLayoutDimension? = nil,
-        scrollBehavior: UICollectionLayoutSectionOrthogonalScrollingBehavior = .none
+        scrollBehavior: UICollectionLayoutSectionOrthogonalScrollingBehavior? = nil
     ) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(widthDimension: itemWidth, heightDimension: itemHeight)
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
@@ -139,24 +142,15 @@ final class WeatherCollectionView: UIView {
         
         // короче меченный. Между элементами интервал понятно. Группы мы сами указываем сколько ячеек в одной группе. Потому если не указывать интервал между группами, то вторая группа не примет значения интер итема
         group.interItemSpacing = .fixed(interItemSpacing)
-        
+
         let section = NSCollectionLayoutSection(group: group)
         // lобавляем скролл, без него работать можно
-//        section.orthogonalScrollingBehavior = scrollBehavior
+        if let scrollBehavior {
+            section.orthogonalScrollingBehavior = scrollBehavior
+        }
         section.interGroupSpacing = interGroupSpacing
         section.contentInsets = sectionInsets
         
-        section.boundarySupplementaryItems = []
-        if let headerHeight {
-            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: headerHeight)
-            let header = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerSize,
-                elementKind: HeaderViewCell.self.description(),
-                alignment: .top
-            )
-            
-            section.boundarySupplementaryItems.append(header)
-        }
         return section
     }
     
@@ -185,8 +179,8 @@ extension WeatherCollectionView: UICollectionViewDelegate, UICollectionViewDataS
         case .weatherByHour(let forecastModel):
             guard let hours = forecastModel.forecast.forecastday.first?.hour else { return total }
             total += hours.count
-            
-            print("TESTTEST \(forecastModel.forecast.forecastday.count)")
+        case .weatherForThreeDays(let forecastModel):
+            total += forecastModel.forecast.forecastday.count
         }
         
         return total
@@ -210,37 +204,26 @@ extension WeatherCollectionView: UICollectionViewDelegate, UICollectionViewDataS
             return cell
         case .weatherByHour(let model):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: ForecastWeatherViewCell.identifire,
+                withReuseIdentifier: ForecastWeatherViewCellV2.identifire,
                 for: indexPath
-            ) as? ForecastWeatherViewCell else { return .init() }
-
+            ) as? ForecastWeatherViewCellV2 else { return .init() }
+            
             if let hour = model.forecast.forecastday.first?.hour[indexPath.item] {
                 cell.configure(with: hour)
             }
-
+            
             return cell
-        }
-    }
-    
-    func collectionView(
-        _ collectionView: UICollectionView,
-        viewForSupplementaryElementOfKind kind: String,
-        at indexPath: IndexPath
-    ) -> UICollectionReusableView {
-        if kind == HeaderViewCell.self.description() {
-            guard let cell = collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: HeaderViewCell.self.description(),
+            
+        case .weatherForThreeDays(let model):
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: WeatherForThreeDays.identifire,
                 for: indexPath
-            ) as? HeaderViewCell else {
-                return .init()
-            }
-            cell.configure(with: "Label with Text")
-            cell.backgroundColor = .gray
+            ) as? WeatherForThreeDays else { return .init() }
+            
+            cell.configure(with: model.forecast.forecastday[indexPath.item])
+            
             return cell
         }
-
-        return UICollectionReusableView()
     }
 }
 

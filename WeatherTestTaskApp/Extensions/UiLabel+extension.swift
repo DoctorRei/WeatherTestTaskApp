@@ -29,12 +29,4 @@ extension UILabel {
         
         attributedText = attributedString
     }
-    
-    func toDateString() -> String {
-            let date = Date(timeIntervalSince1970: TimeInterval(self))
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "dd.MM.yyyy"
-            dateFormatter.locale = Locale.current
-            return dateFormatter.string(from: date)
-        }
 }
