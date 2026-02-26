@@ -110,7 +110,7 @@ extension WeatherModel {
         }
         
         struct Hour: Decodable {
-            let timeEpoch: Int
+            let timeEpoch: Int64
             let time: String
             let tempC: Double
             let tempF: Double
@@ -144,6 +144,16 @@ extension WeatherModel {
             let gustMph: Double
             let gustKph: Double
             let uv: Double
+            
+            func getTime() -> String {
+                let time = TimeInterval(integerLiteral: timeEpoch)
+                let date = Date(timeIntervalSince1970: time)
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "HH:mm"
+                let timeString = dateFormatter.string(from: date)
+
+                return timeString
+            }
         }
     }
 }

@@ -9,45 +9,38 @@ import UIKit
 import SnapKit
 
 protocol WeatherViewControllerProtocol: AnyObject {
-    func updateActualWeather() async
-    func updateForecastWeather() async
+    typealias CurrentModel = WeatherModel.CurrentModel
+    typealias ForecastModel = WeatherModel.ForecastModel
+
+    func updateWeatherCollection(current: CurrentModel, forecast: ForecastModel)
 }
 
 final class WeatherViewController: UIViewController {
     var presenter: WeatherPresenterProtocol?
-    
-    private var currentWeatherView = CurrentWeatherView()
+    private var weatherCollectionView = WeatherCollectionView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .blue
         setupLayout()
-        
-        Task {
-            await updateActualWeather()
-            await updateForecastWeather()
-        }
+        getWeatherData()
+    }
+    
+    private func getWeatherData() {
+        presenter?.getWeatherData()
     }
     
     private func setupLayout() {
-        view.addSubview(currentWeatherView)
-
-        currentWeatherView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(16)
-            make.trailing.equalToSuperview().offset(-16)
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
+        view.addSubview(weatherCollectionView)
+        
+        weatherCollectionView.snp.makeConstraints { make in
+            make.edges.equalTo(view.safeAreaLayoutGuide.snp.edges)
         }
     }
 }
 
 extension WeatherViewController: WeatherViewControllerProtocol {
-    func updateActualWeather() async {
-        guard let data = await presenter?.getWeatherCurrent() else { return }
-        currentWeatherView.configure(with: data)
-    }
-    
-    func updateForecastWeather() async {
-        guard let data = await presenter?.getWeatherForecast() else { return }
-        print("TESTTEST \(data)")
+    @MainActor
+    func updateWeatherCollection(current: CurrentModel, forecast: ForecastModel) {
+        weatherCollectionView.configure(with: current, and: forecast)
     }
 }

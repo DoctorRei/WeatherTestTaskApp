@@ -16,7 +16,11 @@ import SnapKit
 /// Страна
 /// Слева градусы
 
-final class CurrentWeatherView: UIView {
+final class CurrentWeatherCell: UICollectionViewCell {
+    static var identifire: String {
+        description()
+    }
+    
     private enum Const {
         static let cityLabelFontSize: CGFloat = 18
         static let countryLabelFontSize: CGFloat = 16
@@ -26,7 +30,6 @@ final class CurrentWeatherView: UIView {
         static let temperatureStackSpacing: CGFloat = 4
         static let currentWeatherStackInset: CGFloat = 8
         
-        static let celsiusImageName: String = "degreesign.celsius"
         static let celsiusImageSize: CGSize = .init(width: 30, height: 24)
         static let temperatureImageSize: CGFloat = 40
     }
@@ -80,11 +83,10 @@ final class CurrentWeatherView: UIView {
         return stackView
     }()
     
-    init() {
+    override init(frame: CGRect) {
         super.init(frame: .zero)
         setupLayout()
         setupLayer()
-        currentWeatherStack.backgroundColor = .blue
     }
     
     required init?(coder: NSCoder) {
@@ -94,30 +96,15 @@ final class CurrentWeatherView: UIView {
     func configure(with model: WeatherModel.CurrentModel) {
         cityLabel.text = model.location.name
         countryLabel.text = model.location.country
-        createLabelWithImage("\(model.current.tempC)")
+        tempertureLabel.createTextWithCelsiusIcon(model.current.tempC, iconSize: Const.celsiusImageSize)
         temperatureImage.kfDownloadImage(withURL: model.current.condition.iconURL)
     }
     
+    // TODO: - Сделать что-то получше
     private func setupLayer() {
-        layer.borderWidth = 2
-        layer.borderColor = .init(red: 100, green: 0, blue: 100, alpha: 1)
+        layer.borderWidth = 1
+        layer.borderColor = UIColor.black.cgColor
         layer.cornerRadius = 8
-    }
-    
-    private func createLabelWithImage(_ text: String) {
-        let attachment = NSTextAttachment()
-        let imageSize = Const.celsiusImageSize
-        attachment.image = UIImage(systemName: Const.celsiusImageName)
-        attachment.bounds = CGRect(origin: .zero, size: imageSize)
-
-        let attachmentString = NSAttributedString(attachment: attachment)
-        let textString = NSAttributedString(string: text)
-        let attributedString = NSMutableAttributedString()
-
-        attributedString.append(textString)
-        attributedString.append(attachmentString)
-        
-        tempertureLabel.attributedText = attributedString
     }
     
     private func setupLayout() {
@@ -134,5 +121,12 @@ final class CurrentWeatherView: UIView {
         currentWeatherStack.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(Const.currentWeatherStackInset)
         }
+    }
+    
+    override func prepareForReuse() {
+        cityLabel.text = nil
+        countryLabel.text = nil
+        tempertureLabel.text = nil
+        temperatureImage.image = nil
     }
 }
