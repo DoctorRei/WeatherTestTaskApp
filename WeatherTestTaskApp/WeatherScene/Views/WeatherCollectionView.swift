@@ -71,8 +71,8 @@ final class WeatherCollectionView: UIView {
             forCellWithReuseIdentifier: CurrentWeatherCell.identifire
         )
         collectionView.register(
-            ForecastWeatherViewCellV2.self,
-            forCellWithReuseIdentifier: ForecastWeatherViewCellV2.identifire
+            ForecastWeatherCellForHour.self,
+            forCellWithReuseIdentifier: ForecastWeatherCellForHour.identifire
         )
         collectionView.register(
             WeatherForThreeDays.self,
@@ -204,9 +204,9 @@ extension WeatherCollectionView: UICollectionViewDelegate, UICollectionViewDataS
             return cell
         case .weatherByHour(let model):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: ForecastWeatherViewCellV2.identifire,
+                withReuseIdentifier: ForecastWeatherCellForHour.identifire,
                 for: indexPath
-            ) as? ForecastWeatherViewCellV2 else { return .init() }
+            ) as? ForecastWeatherCellForHour else { return .init() }
             
             if let hour = model.forecast.forecastday.first?.hour[indexPath.item] {
                 cell.configure(with: hour)

@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class ForecastWeatherViewCellV2: UICollectionViewCell {
+final class ForecastWeatherCellForHour: UICollectionViewCell {
     static var identifire: String {
         description()
     }
