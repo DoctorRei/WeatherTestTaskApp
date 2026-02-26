@@ -9,8 +9,13 @@ import Moya
 import Alamofire
 
 enum WeatherTarget {
-    case current
-    case forecast3Days
+    struct CoordinateModel {
+        let latitude: String
+        let longitude: String
+    }
+
+    case current(coordinate: CoordinateModel)
+    case forecast3Days(coordinate: CoordinateModel)
 }
 
 extension WeatherTarget: TargetType {
@@ -42,20 +47,20 @@ extension WeatherTarget: TargetType {
 
     var task: Task {
         switch self {
-        case .forecast3Days:
+        case .current(let coordinate):
             return .requestParameters(
                 parameters: [
                     "key": "fa8b3df74d4042b9aa7135114252304",
-                    "q": "LAT,LON",
-                    "days": "3"
+                    "q": "\(coordinate.latitude),\(coordinate.longitude)"
                 ],
                 encoding: URLEncoding.default
             )
-        case .current:
+        case .forecast3Days(let coordinate):
             return .requestParameters(
                 parameters: [
                     "key": "fa8b3df74d4042b9aa7135114252304",
-                    "q": "LAT,LON"
+                    "q": "\(coordinate.latitude),\(coordinate.longitude)",
+                    "days": "3"
                 ],
                 encoding: URLEncoding.default
             )
