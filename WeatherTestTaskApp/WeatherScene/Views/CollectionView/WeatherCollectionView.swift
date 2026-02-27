@@ -72,12 +72,12 @@ final class WeatherCollectionView: UIView {
             forCellWithReuseIdentifier: CurrentWeatherCell.identifire
         )
         collectionView.register(
-            ForecastWeatherCellForHour.self,
-            forCellWithReuseIdentifier: ForecastWeatherCellForHour.identifire
+            ForecastWeatherForHourCell.self,
+            forCellWithReuseIdentifier: ForecastWeatherForHourCell.identifire
         )
         collectionView.register(
-            WeatherForThreeDays.self,
-            forCellWithReuseIdentifier: WeatherForThreeDays.identifire
+            ForecastWeatherForThreeDaysCell.self,
+            forCellWithReuseIdentifier: ForecastWeatherForThreeDaysCell.identifire
         )
     }
     
@@ -99,7 +99,7 @@ extension WeatherCollectionView: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         var sectionsCount = 0
         let sectionItem = dataSource[section]
-        
+
         switch sectionItem {
         case .weatherCurrent:
             sectionsCount += 1
@@ -121,31 +121,19 @@ extension WeatherCollectionView: UICollectionViewDelegate, UICollectionViewDataS
         
         switch sectionItem {
         case .weatherCurrent(let model):
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: CurrentWeatherCell.identifire,
-                for: indexPath
-            ) as? CurrentWeatherCell else { return CurrentWeatherCell() }
-            
+            let cell: CurrentWeatherCell = collectionView.dequeueCell(for: indexPath)
             cell.configure(with: model)
-            
             return cell
+
         case .weatherByHour(let model):
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: ForecastWeatherCellForHour.identifire,
-                for: indexPath
-            ) as? ForecastWeatherCellForHour else { return ForecastWeatherCellForHour() }
+            let cell: ForecastWeatherForHourCell = collectionView.dequeueCell(for: indexPath)
             let hours = model.filterHours()
             cell.configure(with: hours[indexPath.item])
             return cell
-            
+
         case .weatherForThreeDays(let model):
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: WeatherForThreeDays.identifire,
-                for: indexPath
-            ) as? WeatherForThreeDays else { return WeatherForThreeDays() }
-            
+            let cell: ForecastWeatherForThreeDaysCell = collectionView.dequeueCell(for: indexPath)
             cell.configure(with: model.forecast.forecastday[indexPath.item])
-            
             return cell
         }
     }

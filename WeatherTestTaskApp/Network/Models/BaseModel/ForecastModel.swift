@@ -17,8 +17,8 @@ extension WeatherModel {
             var filteredHours: [Details.Hour] = []
             let now = Date()
             let dateFormatter = DateFormatter()
-            
             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+
             guard forecast.forecastday.count >= 2 else { return [] }
 
             let today = forecast.forecastday[0]

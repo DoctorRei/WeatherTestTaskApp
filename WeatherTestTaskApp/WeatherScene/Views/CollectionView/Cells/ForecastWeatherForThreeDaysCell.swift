@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class WeatherForThreeDays: UICollectionViewCell {
+final class ForecastWeatherForThreeDaysCell: UICollectionViewCell {
     static var identifire: String {
         description()
     }
@@ -79,5 +79,11 @@ final class WeatherForThreeDays: UICollectionViewCell {
         weatherStackView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
+    }
+}
+
+extension ForecastWeatherForThreeDaysCell: ConfigurableCell {
+    static var reuseIdentifier: String {
+        return identifire
     }
 }

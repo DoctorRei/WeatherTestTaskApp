@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class ForecastWeatherCellForHour: UICollectionViewCell {
+final class ForecastWeatherForHourCell: UICollectionViewCell {
     static var identifire: String {
         description()
     }
@@ -70,3 +70,8 @@ final class ForecastWeatherCellForHour: UICollectionViewCell {
     }
 }
 
+extension ForecastWeatherForHourCell: ConfigurableCell {
+    static var reuseIdentifier: String {
+        return identifire
+    }
+}
