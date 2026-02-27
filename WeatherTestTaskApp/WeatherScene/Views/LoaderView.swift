@@ -67,6 +67,16 @@ final class LoaderView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    func start(with message: String = "Загрузка...") {
+        messageLabel.text = message
+        activityIndicator.startAnimating()
+    }
+    
+    func stop() {
+        messageLabel.text = nil
+        activityIndicator.stopAnimating()
+    }
     
     private func setupUI() {
         addSubviews(containerView)
@@ -83,16 +93,5 @@ final class LoaderView: UIView {
             make.centerY.equalToSuperview()
             make.horizontalEdges.equalToSuperview()
         }
-    }
-    
-    // MARK: - Public Methods
-    func start(with message: String = "Загрузка...") {
-        messageLabel.text = message
-        activityIndicator.startAnimating()
-    }
-    
-    func stop() {
-        messageLabel.text = nil
-        activityIndicator.stopAnimating()
     }
 }
