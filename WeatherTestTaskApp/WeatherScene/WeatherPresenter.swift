@@ -55,7 +55,10 @@ extension WeatherPresenter: WeatherPresenterProtocol {
             
             let (current, forecast) = await (actualWeather, forecastWeather)
             
-            guard let current, let forecast else { return }
+            guard let current, let forecast else {
+                view?.showError()
+                return
+            }
             view?.updateWeatherCollection(current: current, forecast: forecast)
         }
     }

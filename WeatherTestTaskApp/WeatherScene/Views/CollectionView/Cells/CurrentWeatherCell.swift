@@ -127,3 +127,9 @@ final class CurrentWeatherCell: UICollectionViewCell {
         temperatureImage.image = nil
     }
 }
+
+extension CurrentWeatherCell: ConfigurableCell {
+    static var reuseIdentifier: String {
+        return identifire
+    }
+}

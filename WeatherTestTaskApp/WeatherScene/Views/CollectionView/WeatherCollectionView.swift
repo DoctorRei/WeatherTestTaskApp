@@ -51,9 +51,7 @@ final class WeatherCollectionView: UIView {
         let forecastForThreeDays = WeatherSectionTypes.weatherForThreeDays(forecast)
         
         dataSource.append(currentType)
-        if forecast.forecast.forecastday.count > 1 {
-            dataSource.append(forecastForThreeDays)
-        }
+        dataSource.append(forecastForThreeDays)
         dataSource.append(forecastType)
         
         collectionView.reloadData()
@@ -74,12 +72,12 @@ final class WeatherCollectionView: UIView {
             forCellWithReuseIdentifier: CurrentWeatherCell.identifire
         )
         collectionView.register(
-            ForecastWeatherCellForHour.self,
-            forCellWithReuseIdentifier: ForecastWeatherCellForHour.identifire
+            ForecastWeatherForHourCell.self,
+            forCellWithReuseIdentifier: ForecastWeatherForHourCell.identifire
         )
         collectionView.register(
-            WeatherForThreeDays.self,
-            forCellWithReuseIdentifier: WeatherForThreeDays.identifire
+            ForecastWeatherForThreeDaysCell.self,
+            forCellWithReuseIdentifier: ForecastWeatherForThreeDaysCell.identifire
         )
     }
     
@@ -101,12 +99,12 @@ extension WeatherCollectionView: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         var sectionsCount = 0
         let sectionItem = dataSource[section]
-        
+
         switch sectionItem {
         case .weatherCurrent:
             sectionsCount += 1
         case .weatherByHour(let forecastModel):
-            guard let hours = forecastModel.forecast.forecastday.first?.hour else { return sectionsCount }
+            let hours = forecastModel.filterHours()
             sectionsCount += hours.count
         case .weatherForThreeDays(let forecastModel):
             sectionsCount += forecastModel.forecast.forecastday.count
@@ -123,34 +121,19 @@ extension WeatherCollectionView: UICollectionViewDelegate, UICollectionViewDataS
         
         switch sectionItem {
         case .weatherCurrent(let model):
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: CurrentWeatherCell.identifire,
-                for: indexPath
-            ) as? CurrentWeatherCell else { return .init() }
-            
+            let cell: CurrentWeatherCell = collectionView.dequeueCell(for: indexPath)
             cell.configure(with: model)
-            
             return cell
+
         case .weatherByHour(let model):
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: ForecastWeatherCellForHour.identifire,
-                for: indexPath
-            ) as? ForecastWeatherCellForHour else { return .init() }
-            
-            if let hour = model.forecast.forecastday.first?.hour[indexPath.item] {
-                cell.configure(with: hour)
-            }
-            
+            let cell: ForecastWeatherForHourCell = collectionView.dequeueCell(for: indexPath)
+            let hours = model.filterHours()
+            cell.configure(with: hours[indexPath.item])
             return cell
-            
+
         case .weatherForThreeDays(let model):
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: WeatherForThreeDays.identifire,
-                for: indexPath
-            ) as? WeatherForThreeDays else { return .init() }
-            
+            let cell: ForecastWeatherForThreeDaysCell = collectionView.dequeueCell(for: indexPath)
             cell.configure(with: model.forecast.forecastday[indexPath.item])
-            
             return cell
         }
     }

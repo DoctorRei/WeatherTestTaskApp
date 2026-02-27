@@ -8,6 +8,10 @@
 import UIKit
 import SnapKit
 
+protocol LoaderViewDelegate: AnyObject {
+    func buttonTap()
+}
+
 final class LoaderView: UIView {
     private enum Const {
         enum Font {
@@ -17,6 +21,7 @@ final class LoaderView: UIView {
         enum Color {
             static let softPink: UIColor = .systemPink.withAlphaComponent(0.2)
             static let white: CGColor = UIColor.white.cgColor
+            static let red: CGColor = UIColor.red.withAlphaComponent(0.2).cgColor
         }
         
         enum Layout {
@@ -24,10 +29,18 @@ final class LoaderView: UIView {
             static let weidthStatic: CGFloat = 200
         }
         
+        enum Text {
+            static let loading: String = "Loading..."
+            static let error: String = "Error.Try Again"
+            static let refresh: String = "Refresh"
+        }
+        
         static let containerCornerRadius: CGFloat = 16
         static let containerBorderWidth: CGFloat = 1
         static let containerSpacing: CGFloat = 10
     }
+    
+    weak var delegate: LoaderViewDelegate?
     
     private let activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
@@ -48,8 +61,19 @@ final class LoaderView: UIView {
         view.layer.cornerRadius = Const.containerCornerRadius
         view.layer.borderWidth = Const.containerBorderWidth
         view.layer.borderColor = Const.Color.white
-        view.clipsToBounds = true
         return view
+    }()
+    
+    private let refreshButton: UIButton = {
+        let button = UIButton()
+        button.setTitle(Const.Text.refresh, for: .normal)
+        button.backgroundColor = Const.Color.softPink
+        button.layer.borderWidth = Const.containerBorderWidth
+        button.layer.borderColor = Const.Color.white
+        button.layer.cornerRadius = 8
+        button.isHidden = true
+        button.addTarget(self, action: #selector(refreshButtonTap), for: .touchUpInside)
+        return button
     }()
     
     private let loaderStackView: UIStackView = {
@@ -58,7 +82,7 @@ final class LoaderView: UIView {
         stack.spacing = Const.containerSpacing
         return stack
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -68,9 +92,40 @@ final class LoaderView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func showError() {
+        isNeedToShowError(with: true)
+        setupLabelText(with: Const.Text.error)
+    }
+
+    func start() {
+        isNeedToShowError(with: false)
+        setupLabelText(with: Const.Text.loading)
+        activityIndicator.startAnimating()
+    }
+    
+    func stop() {
+        setupLabelText(with: nil)
+        activityIndicator.stopAnimating()
+    }
+    
+    @objc func refreshButtonTap() {
+        start()
+        delegate?.buttonTap()
+    }
+    
+    private func setupLabelText(with text: String?) {
+        messageLabel.text = text
+    }
+    
+    private func isNeedToShowError(with value: Bool) {
+        activityIndicator.isHidden = value
+        refreshButton.isHidden = !value
+        containerView.layer.borderColor = value ? Const.Color.red : Const.Color.white
+    }
+    
     private func setupUI() {
         addSubviews(containerView)
-        loaderStackView.addArrangedSubviews(activityIndicator, messageLabel)
+        loaderStackView.addArrangedSubviews(activityIndicator, messageLabel, refreshButton)
         containerView.addSubview(loaderStackView)
         
         containerView.snp.makeConstraints { make in
@@ -83,16 +138,5 @@ final class LoaderView: UIView {
             make.centerY.equalToSuperview()
             make.horizontalEdges.equalToSuperview()
         }
-    }
-    
-    // MARK: - Public Methods
-    func start(with message: String = "Загрузка...") {
-        messageLabel.text = message
-        activityIndicator.startAnimating()
-    }
-    
-    func stop() {
-        messageLabel.text = nil
-        activityIndicator.stopAnimating()
     }
 }
