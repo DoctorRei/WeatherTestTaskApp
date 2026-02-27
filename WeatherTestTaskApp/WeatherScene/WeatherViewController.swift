@@ -14,6 +14,7 @@ protocol WeatherViewControllerProtocol: AnyObject {
     typealias ForecastModel = WeatherModel.ForecastModel
 
     func updateWeatherCollection(current: CurrentModel, forecast: ForecastModel)
+    func showError()
 }
 
 final class WeatherViewController: UIViewController {
@@ -59,5 +60,19 @@ extension WeatherViewController: WeatherViewControllerProtocol {
             self.loader.alpha = 0
         }
         weatherCollectionView.configure(with: current, and: forecast)
+    }
+    
+    @MainActor
+    func showError() {
+        // TODO: - Мне нужно убежать к специалисту по записи. Если смотришь сегодня (27 февраля) к вечеру доделаю и сотру коммент
+        loader.showError()
+    }
+}
+
+extension WeatherViewController: LoaderViewDelegate {
+    @MainActor
+    func buttonTap() {
+        // TODO: - Мне нужно убежать к специалисту по записи. Если смотришь сегодня (27 февраля) к вечеру доделаю и сотру коммент
+        presenter?.viewDidLoad()
     }
 }
