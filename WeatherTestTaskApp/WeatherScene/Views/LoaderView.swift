@@ -128,13 +128,13 @@ final class LoaderView: UIView {
         addSubviews(containerView)
         loaderStackView.addArrangedSubviews(activityIndicator, messageLabel, refreshButton)
         containerView.addSubview(loaderStackView)
-        
+
         containerView.snp.makeConstraints { make in
             make.center.equalToSuperview()
             make.height.equalTo(Const.Layout.heightStatic)
             make.width.equalTo(Const.Layout.weidthStatic)
         }
-        
+
         loaderStackView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }

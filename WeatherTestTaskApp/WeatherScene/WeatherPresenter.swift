@@ -18,11 +18,11 @@ final class WeatherPresenter {
     enum Const {
         static let moscowCoordinates = Coordinate(latitude: "55.7558", longitude: "37.6176")
     }
-    
+
     weak var view: WeatherViewControllerProtocol?
     private var weatherLoaderService: WeatherLoaderServiceProtocol?
     private var locationManager: LocationManagerProtocol?
-    
+
     init(weatherLoaderService: WeatherLoaderServiceProtocol, locationManager: LocationManagerProtocol) {
         self.weatherLoaderService = weatherLoaderService
         self.locationManager = locationManager
@@ -51,9 +51,9 @@ extension WeatherPresenter: WeatherPresenterProtocol {
         Task {
             async let actualWeather = getWeatherCurrent(with: coordinate)
             async let forecastWeather = getWeatherForecast(with: coordinate)
-            
+
             let (current, forecast) = await (actualWeather, forecastWeather)
-            
+
             guard let current, let forecast else {
                 view?.showError()
                 return

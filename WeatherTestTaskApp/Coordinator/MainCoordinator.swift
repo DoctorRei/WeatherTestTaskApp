@@ -10,7 +10,7 @@ import UIKit
 final class MainCoordinator: NSObject {
     private weak var window: UIWindow?
     private let navigation = UINavigationController()
-    
+
     //MARK: - Main
     func start(with window: UIWindow?) {
         self.window = window

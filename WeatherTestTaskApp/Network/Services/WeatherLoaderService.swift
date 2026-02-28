@@ -10,7 +10,7 @@ import Moya
 protocol WeatherLoaderServiceProtocol: AnyObject {
     typealias CurrentModel = WeatherModel.CurrentModel
     typealias ForecastModel = WeatherModel.ForecastModel
-    
+
     func getWeatherCurrent(latitude: String, longitude: String) async throws -> CurrentModel?
     func getWeatherForecast(latitude: String, longitude: String) async throws -> ForecastModel?
 }
@@ -45,7 +45,7 @@ extension WeatherLoaderService: WeatherLoaderServiceProtocol {
             }
         }
     }
-    
+
     func getWeatherCurrent(latitude: String, longitude: String) async throws -> CurrentModel? {
         let coordinateModel = LocationModel.Coordinate(latitude: latitude, longitude: longitude)
         return try await withCheckedThrowingContinuation { continuation in
@@ -58,7 +58,7 @@ extension WeatherLoaderService: WeatherLoaderServiceProtocol {
                     } catch {
                         continuation.resume(throwing: error)
                     }
-                    
+
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }

@@ -46,7 +46,7 @@ extension WeatherSection {
         let groupSpacing: Double
         let sectionInsets: NSDirectionalEdgeInsets
         let scrollBehavior: UICollectionLayoutSectionOrthogonalScrollingBehavior?
-        
+
         init(
             itemWidth: NSCollectionLayoutDimension,
             itemHeight: NSCollectionLayoutDimension,

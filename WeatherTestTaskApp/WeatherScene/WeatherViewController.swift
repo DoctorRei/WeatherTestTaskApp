@@ -22,14 +22,14 @@ final class WeatherViewController: UIViewController {
         enum Color {
             static let backgroundColor: UIColor = .blue.withAlphaComponent(0.1)
         }
-        
+
         static let animationDuration: CGFloat = 0.2
     }
-    
+
     var presenter: WeatherPresenterProtocol?
     private var weatherCollectionView = WeatherCollectionView()
     private var loader = LoaderView()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
@@ -38,15 +38,15 @@ final class WeatherViewController: UIViewController {
         presenter?.viewDidLoad()
         view.backgroundColor = Const.Color.backgroundColor
     }
-    
+
     private func setupLayout() {
         view.addSubview(weatherCollectionView)
         view.addSubview(loader)
-        
+
         weatherCollectionView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide.snp.edges)
         }
-        
+
         loader.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide.snp.edges)
         }
@@ -62,7 +62,7 @@ extension WeatherViewController: WeatherViewControllerProtocol {
             self.loader.alpha = 0
         }
     }
-    
+
     @MainActor
     func showError() {
         loader.showError()

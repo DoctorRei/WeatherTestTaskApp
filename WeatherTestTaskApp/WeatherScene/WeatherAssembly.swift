@@ -19,7 +19,7 @@ final class WeatherAssembly: WeatherAssemblyProtocol {
         let presenter = WeatherPresenter(weatherLoaderService: weatherLoaderSevice, locationManager: locationManager)
         viewController.presenter = presenter
         presenter.view = viewController
-        
+
         return viewController
     }
 }

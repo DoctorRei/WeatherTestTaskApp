@@ -19,4 +19,3 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         mainCoordinator.start(with: window)
     }
 }
-

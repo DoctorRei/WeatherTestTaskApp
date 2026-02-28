@@ -19,7 +19,7 @@ extension WeatherModel {
             let localtimeEpoch: Int
             let localtime: String
         }
-        
+
         struct Current: Decodable {
             let lastUpdatedEpoch: Int
             let lastUpdated: String
@@ -51,22 +51,22 @@ extension WeatherModel {
             let gustMph: Double
             let gustKph: Double
         }
-        
+
         struct Condition: Decodable {
             let text: String
             let icon: String
             let code: Int
-            
+
             var iconURL: URL? {
                 let baseURL = "https:\(icon)"
                 return URL(string: baseURL)
             }
         }
-        
+
         struct Forecast: Decodable {
             let forecastday: [ForecastDay]
         }
-        
+
         struct ForecastDay: Decodable {
             let date: String
             let dateEpoch: Int
@@ -74,7 +74,7 @@ extension WeatherModel {
             let astro: Astro
             let hour: [Hour]
         }
-        
+
         struct Day: Decodable {
             let maxtempC: Double
             let maxtempF: Double
@@ -97,7 +97,7 @@ extension WeatherModel {
             let condition: Condition
             let uv: Double
         }
-        
+
         struct Astro: Decodable {
             let sunrise: String
             let sunset: String
@@ -108,7 +108,7 @@ extension WeatherModel {
             let isMoonUp: Int
             let isSunUp: Int
         }
-        
+
         struct Hour: Decodable {
             let timeEpoch: Int64
             let time: String
@@ -144,7 +144,7 @@ extension WeatherModel {
             let gustMph: Double
             let gustKph: Double
             let uv: Double
-            
+
             func getTime() -> String {
                 let time = TimeInterval(integerLiteral: timeEpoch)
                 let date = Date(timeIntervalSince1970: time)

@@ -9,7 +9,7 @@ extension LocationModel {
     struct Coordinate {
         let latitude: String
         let longitude: String
-        
+
         init(latitude: String, longitude: String) {
             self.latitude = latitude
             self.longitude = longitude

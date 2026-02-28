@@ -11,7 +11,7 @@ extension LocationModel {
     enum LocationError: LocalizedError {
         case authorizationDenied
         case unknown
-        
+
         var errorDescription: String? {
             switch self {
             case .authorizationDenied:

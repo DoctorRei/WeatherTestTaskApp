@@ -24,7 +24,7 @@ extension WeatherTarget: TargetType {
         static let threeDaysCount: String = "3"
         static let header: [String: String] = ["Content-type": "application/json"]
     }
-    
+
     var baseURL: URL {
         return URL(string: Const.basePath)!
     }

@@ -11,7 +11,7 @@ enum WeatherSection: Int, CaseIterable {
     case current
     case threeDays
     case hourly
-    
+
     func createLayout() -> NSCollectionLayoutSection {
         switch self {
         case .current:
