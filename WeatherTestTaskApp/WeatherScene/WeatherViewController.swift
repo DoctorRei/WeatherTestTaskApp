@@ -22,30 +22,31 @@ final class WeatherViewController: UIViewController {
         enum Color {
             static let backgroundColor: UIColor = .blue.withAlphaComponent(0.1)
         }
-        
+
         static let animationDuration: CGFloat = 0.2
     }
-    
+
     var presenter: WeatherPresenterProtocol?
     private var weatherCollectionView = WeatherCollectionView()
     private var loader = LoaderView()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        presenter?.viewDidLoad()
         setupLayout()
         loader.start()
+        loader.delegate = self
+        presenter?.viewDidLoad()
         view.backgroundColor = Const.Color.backgroundColor
     }
-    
+
     private func setupLayout() {
         view.addSubview(weatherCollectionView)
         view.addSubview(loader)
-        
+
         weatherCollectionView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide.snp.edges)
         }
-        
+
         loader.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide.snp.edges)
         }
@@ -55,16 +56,15 @@ final class WeatherViewController: UIViewController {
 extension WeatherViewController: WeatherViewControllerProtocol {
     @MainActor
     func updateWeatherCollection(current: CurrentModel, forecast: ForecastModel) {
+        weatherCollectionView.configure(with: current, and: forecast)
         loader.stop()
         UIView.animate(withDuration: Const.animationDuration) {
             self.loader.alpha = 0
         }
-        weatherCollectionView.configure(with: current, and: forecast)
     }
-    
+
     @MainActor
     func showError() {
-        // TODO: - Мне нужно убежать к специалисту по записи. Если смотришь сегодня (27 февраля) к вечеру доделаю и сотру коммент
         loader.showError()
     }
 }
@@ -72,7 +72,6 @@ extension WeatherViewController: WeatherViewControllerProtocol {
 extension WeatherViewController: LoaderViewDelegate {
     @MainActor
     func buttonTap() {
-        // TODO: - Мне нужно убежать к специалисту по записи. Если смотришь сегодня (27 февраля) к вечеру доделаю и сотру коммент
         presenter?.viewDidLoad()
     }
 }

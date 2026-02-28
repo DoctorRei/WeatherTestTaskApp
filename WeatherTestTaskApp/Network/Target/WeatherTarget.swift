@@ -9,13 +9,10 @@ import Moya
 import Alamofire
 
 enum WeatherTarget {
-    struct CoordinateModel {
-        let latitude: String
-        let longitude: String
-    }
+    typealias Coordinate = LocationModel.Coordinate
 
-    case current(coordinate: CoordinateModel)
-    case forecast3Days(coordinate: CoordinateModel)
+    case current(coordinate: Coordinate)
+    case forecast3Days(coordinate: Coordinate)
 }
 
 extension WeatherTarget: TargetType {
@@ -23,8 +20,11 @@ extension WeatherTarget: TargetType {
         static let basePath: String = "https://api.weatherapi.com/v1"
         static let current: String = "/current.json"
         static let forecast3Days: String = "/forecast.json"
+        static let APIKey: String = "fa8b3df74d4042b9aa7135114252304"
+        static let threeDaysCount: String = "3"
+        static let header: [String: String] = ["Content-type": "application/json"]
     }
-    
+
     var baseURL: URL {
         return URL(string: Const.basePath)!
     }
@@ -50,7 +50,7 @@ extension WeatherTarget: TargetType {
         case .current(let coordinate):
             return .requestParameters(
                 parameters: [
-                    "key": "fa8b3df74d4042b9aa7135114252304",
+                    "key": Const.APIKey,
                     "q": "\(coordinate.latitude),\(coordinate.longitude)"
                 ],
                 encoding: URLEncoding.default
@@ -58,9 +58,9 @@ extension WeatherTarget: TargetType {
         case .forecast3Days(let coordinate):
             return .requestParameters(
                 parameters: [
-                    "key": "fa8b3df74d4042b9aa7135114252304",
+                    "key": Const.APIKey,
                     "q": "\(coordinate.latitude),\(coordinate.longitude)",
-                    "days": "3"
+                    "days": Const.threeDaysCount
                 ],
                 encoding: URLEncoding.default
             )
@@ -68,6 +68,6 @@ extension WeatherTarget: TargetType {
     }
 
     var headers: [String: String]? {
-        return ["Content-type": "application/json"]
+        Const.header
     }
 }

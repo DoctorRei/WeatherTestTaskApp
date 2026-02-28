@@ -12,7 +12,7 @@ extension UIImageView {
         static let defaultImageSize: Int = 64
         static let animationTime: Double = 1
     }
-    
+
     func kfDownloadImage(withURL url: URL?) {
         guard let url else { return }
         

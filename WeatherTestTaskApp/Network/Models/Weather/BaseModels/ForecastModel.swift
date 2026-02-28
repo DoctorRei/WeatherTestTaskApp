@@ -12,7 +12,7 @@ extension WeatherModel {
         let location: Details.Location
         let current: Details.Current
         let forecast: Details.Forecast
-        
+
         func filterHours() -> [Details.Hour] {
             var filteredHours: [Details.Hour] = []
             let now = Date()
@@ -23,7 +23,7 @@ extension WeatherModel {
 
             let today = forecast.forecastday[0]
             let tomorrow = forecast.forecastday[1]
-            
+
             let remainingTodayHours = today.hour.filter { hour in
                 if let hourDate = dateFormatter.date(from: hour.time) {
                     return hourDate >= now

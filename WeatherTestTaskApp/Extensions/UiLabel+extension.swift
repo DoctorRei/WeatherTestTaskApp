@@ -12,7 +12,7 @@ extension UILabel {
         static let celsiusImageName: String = "degreesign.celsius"
         static let celsiusImageSize: CGSize = .init(width: 20, height: 14)
     }
-    
+
     func createTextWithCelsiusIcon(_ temperature: Double, iconSize: CGSize = Const.celsiusImageSize) {
         let text = "\(temperature)"
         let attachment = NSTextAttachment()
@@ -26,7 +26,7 @@ extension UILabel {
 
         attributedString.append(textString)
         attributedString.append(attachmentString)
-        
+
         attributedText = attributedString
     }
 }
