@@ -32,9 +32,10 @@ final class WeatherViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        presenter?.viewDidLoad()
         setupLayout()
         loader.start()
+        loader.delegate = self
+        presenter?.viewDidLoad()
         view.backgroundColor = Const.Color.backgroundColor
     }
     
@@ -55,16 +56,15 @@ final class WeatherViewController: UIViewController {
 extension WeatherViewController: WeatherViewControllerProtocol {
     @MainActor
     func updateWeatherCollection(current: CurrentModel, forecast: ForecastModel) {
+        weatherCollectionView.configure(with: current, and: forecast)
         loader.stop()
         UIView.animate(withDuration: Const.animationDuration) {
             self.loader.alpha = 0
         }
-        weatherCollectionView.configure(with: current, and: forecast)
     }
     
     @MainActor
     func showError() {
-        // TODO: - Мне нужно убежать к специалисту по записи. Если смотришь сегодня (27 февраля) к вечеру доделаю и сотру коммент
         loader.showError()
     }
 }
@@ -72,7 +72,6 @@ extension WeatherViewController: WeatherViewControllerProtocol {
 extension WeatherViewController: LoaderViewDelegate {
     @MainActor
     func buttonTap() {
-        // TODO: - Мне нужно убежать к специалисту по записи. Если смотришь сегодня (27 февраля) к вечеру доделаю и сотру коммент
         presenter?.viewDidLoad()
     }
 }

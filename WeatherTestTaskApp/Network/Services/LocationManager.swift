@@ -8,27 +8,16 @@
 import Foundation
 import CoreLocation
 
-enum LocationError: LocalizedError {
-    case authorizationDenied
-    case unknown
-    
-    var errorDescription: String? {
-        switch self {
-        case .authorizationDenied:
-            return "Доступ к геолокации запрещен"
-        case .unknown:
-            return "Неизвестная ошибка геолокации"
-        }
-    }
-}
-
 protocol LocationManagerProtocol: AnyObject {
-    func requestLocation() async throws -> CLLocationCoordinate2D
+    typealias Coordinate = LocationModel.Coordinate
+    typealias LocationError = LocationModel.LocationError
+
+    func requestLocation() async throws -> Coordinate
 }
 
 final class LocationManager: NSObject {
     private let locationManager = CLLocationManager()
-    private var locationContinuation: CheckedContinuation<CLLocationCoordinate2D, Error>?
+    private var locationContinuation: CheckedContinuation<Coordinate, Error>?
     
     override init() {
         super.init()
@@ -37,6 +26,7 @@ final class LocationManager: NSObject {
     }
 }
 
+// MARK: - CLLocationManagerDelegate
 extension LocationManager: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus
@@ -56,7 +46,7 @@ extension LocationManager: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-        locationContinuation?.resume(returning: location.coordinate)
+        locationContinuation?.resume(returning: Coordinate(coordinate: location.coordinate))
         locationContinuation = nil
     }
     
@@ -66,8 +56,9 @@ extension LocationManager: CLLocationManagerDelegate {
     }
 }
 
+// MARK: - LocationManagerProtocol
 extension LocationManager: LocationManagerProtocol {
-    func requestLocation() async throws -> CLLocationCoordinate2D {
+    func requestLocation() async throws -> Coordinate {
         let status = locationManager.authorizationStatus
         
         switch status {
@@ -89,5 +80,13 @@ extension LocationManager: LocationManagerProtocol {
         @unknown default:
             throw LocationError.unknown
         }
+    }
+}
+
+// MARK: - Coordinate Helper
+private extension LocationModel.Coordinate {
+    init(coordinate: CLLocationCoordinate2D) {
+        self.latitude = coordinate.latitude.description
+        self.longitude = coordinate.longitude.description
     }
 }

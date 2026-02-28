@@ -37,14 +37,6 @@ final class WeatherCollectionView: UIView {
         fatalError()
     }
     
-    private func setupLayout() {
-        addSubview(collectionView)
-        
-        collectionView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-    }
-    
     func configure(with current: CurrentModel, and forecast: ForecastModel) {
         let currentType = WeatherSectionTypes.weatherCurrent(current)
         let forecastType = WeatherSectionTypes.weatherByHour(forecast)
@@ -55,6 +47,14 @@ final class WeatherCollectionView: UIView {
         dataSource.append(forecastType)
         
         collectionView.reloadData()
+    }
+    
+    private func setupLayout() {
+        addSubview(collectionView)
+        
+        collectionView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     private func setupCollectionView() {
@@ -81,7 +81,7 @@ final class WeatherCollectionView: UIView {
         )
     }
     
-    func createFlowLayout() -> UICollectionViewCompositionalLayout {
+    private func createFlowLayout() -> UICollectionViewCompositionalLayout {
         let layout = UICollectionViewCompositionalLayout { index, env in
             guard let section = WeatherSection(rawValue: index) else { return nil }
             
@@ -91,6 +91,7 @@ final class WeatherCollectionView: UIView {
     }
 }
 
+// MARK: - UICollectionView Delegate && DataSource
 extension WeatherCollectionView: UICollectionViewDelegate, UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return dataSource.count

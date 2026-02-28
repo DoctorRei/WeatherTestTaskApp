@@ -8,8 +8,11 @@
 import Moya
 
 protocol WeatherLoaderServiceProtocol: AnyObject {
-    func getWeatherCurrent(latitude: String, longitude: String) async throws -> WeatherModel.CurrentModel
-    func getWeatherForecast(latitude: String, longitude: String) async throws -> WeatherModel.ForecastModel
+    typealias CurrentModel = WeatherModel.CurrentModel
+    typealias ForecastModel = WeatherModel.ForecastModel
+    
+    func getWeatherCurrent(latitude: String, longitude: String) async throws -> CurrentModel?
+    func getWeatherForecast(latitude: String, longitude: String) async throws -> ForecastModel?
 }
 
 final class WeatherLoaderService {
@@ -24,8 +27,8 @@ final class WeatherLoaderService {
 }
 
 extension WeatherLoaderService: WeatherLoaderServiceProtocol {
-    func getWeatherForecast(latitude: String, longitude: String) async throws -> WeatherModel.ForecastModel {
-        let coordinateModel = WeatherTarget.CoordinateModel(latitude: latitude, longitude: longitude)
+    func getWeatherForecast(latitude: String, longitude: String) async throws -> ForecastModel? {
+        let coordinateModel = LocationModel.Coordinate(latitude: latitude, longitude: longitude)
         return try await withCheckedThrowingContinuation { continuation in
             provider.request(.forecast3Days(coordinate: coordinateModel)) { result in
                 switch result {
@@ -43,8 +46,8 @@ extension WeatherLoaderService: WeatherLoaderServiceProtocol {
         }
     }
     
-    func getWeatherCurrent(latitude: String, longitude: String) async throws -> WeatherModel.CurrentModel {
-        let coordinateModel = WeatherTarget.CoordinateModel(latitude: latitude, longitude: longitude)
+    func getWeatherCurrent(latitude: String, longitude: String) async throws -> CurrentModel? {
+        let coordinateModel = LocationModel.Coordinate(latitude: latitude, longitude: longitude)
         return try await withCheckedThrowingContinuation { continuation in
             provider.request(.current(coordinate: coordinateModel)) { result in
                 switch result {

@@ -32,7 +32,13 @@ final class CurrentWeatherCell: UICollectionViewCell {
         static let cornerRadius: CGFloat = 8
     }
     
-    private var cityLabel: UILabel = {
+    private var districtLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: Const.cityLabelFontSize)
+        return label
+    }()
+    
+    private var regionLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: Const.cityLabelFontSize)
         return label
@@ -49,7 +55,6 @@ final class CurrentWeatherCell: UICollectionViewCell {
         let label = UILabel()
         label.textColor = .black
         label.font = .systemFont(ofSize: Const.temperatureLabelFontSize)
-        
         return label
     }()
     
@@ -92,7 +97,8 @@ final class CurrentWeatherCell: UICollectionViewCell {
     }
     
     func configure(with model: WeatherModel.CurrentModel) {
-        cityLabel.text = model.location.name
+        districtLabel.text = model.location.name
+        regionLabel.text = model.location.region
         countryLabel.text = model.location.country
         tempertureLabel.createTextWithCelsiusIcon(model.current.tempC, iconSize: Const.celsiusImageSize)
         temperatureImage.kfDownloadImage(withURL: model.current.condition.iconURL)
@@ -105,7 +111,7 @@ final class CurrentWeatherCell: UICollectionViewCell {
     }
     
     private func setupLayout() {
-        locationInfoStack.addArrangedSubviews(cityLabel, countryLabel)
+        locationInfoStack.addArrangedSubviews(districtLabel, regionLabel, countryLabel)
         temperatureStack.addArrangedSubviews(temperatureImage, tempertureLabel)
         currentWeatherStack.addArrangedSubviews(locationInfoStack, temperatureStack)
         
@@ -121,9 +127,7 @@ final class CurrentWeatherCell: UICollectionViewCell {
     }
     
     override func prepareForReuse() {
-        cityLabel.text = nil
-        countryLabel.text = nil
-        tempertureLabel.text = nil
+        [districtLabel, regionLabel, countryLabel, tempertureLabel].forEach { $0.text = nil }
         temperatureImage.image = nil
     }
 }
