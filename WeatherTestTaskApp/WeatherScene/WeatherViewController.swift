@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreLocation
 import SnapKit
 
 protocol WeatherViewControllerProtocol: AnyObject {
