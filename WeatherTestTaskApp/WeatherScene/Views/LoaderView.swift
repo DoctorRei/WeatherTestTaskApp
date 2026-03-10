@@ -72,7 +72,7 @@ final class LoaderView: UIView {
         button.layer.cornerRadius = Const.buttonCornerRadius
         button.contentEdgeInsets = Const.buttonInsets
         button.isHidden = true
-        button.addTarget(LoaderView.self, action: #selector(refreshButtonTap), for: .touchUpInside)
+        button.addTarget(self, action: #selector(refreshButtonTap), for: .touchUpInside)
         return button
     }()
 
